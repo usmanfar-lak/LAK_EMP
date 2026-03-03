@@ -1,0 +1,15 @@
+{
+  "name": "lakarya-ess",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.6"
+  }
+}

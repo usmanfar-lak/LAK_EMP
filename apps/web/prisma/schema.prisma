@@ -1,0 +1,8 @@
+// Re-export schema for Prisma CLI when running inside apps/web
+// Keep single source of truth in packages/db/prisma/schema.prisma
+// This file allows `prisma` commands to work in apps/web.
+
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+// Include via copy during development.

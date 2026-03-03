@@ -1,0 +1,148 @@
+generator client { provider = "prisma-client-js" }
+
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+enum LeaveStatus { PENDING APPROVED REJECTED }
+enum AppraisalStatus { DRAFT SUBMITTED REVIEWED }
+
+model User {
+  id           String  @id @default(cuid())
+  entraOid     String  @unique
+  upn          String  @unique
+  email        String  @unique
+  displayName  String
+  departmentId String?
+  designation  String?
+  managerId    String?
+  isActive     Boolean @default(true)
+
+  department   Department? @relation(fields: [departmentId], references: [id])
+  manager      User? @relation("ManagerReports", fields: [managerId], references: [id])
+  reports      User[] @relation("ManagerReports")
+
+  leaveRequests LeaveRequest[]
+  appraisals    Appraisal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Department {
+  id        String @id @default(cuid())
+  name      String @unique
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+model LeaveType {
+  id        String @id @default(cuid())
+  name      String @unique
+  maxDays   Int?
+  requiresApproval Boolean @default(true)
+  createdAt DateTime @default(now())
+}
+
+model LeaveBalance {
+  id          String @id @default(cuid())
+  userId      String
+  leaveTypeId String
+  year        Int
+  opening     Float @default(0)
+  accrued     Float @default(0)
+  used        Float @default(0)
+
+  user      User @relation(fields: [userId], references: [id])
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [id])
+
+  @@unique([userId, leaveTypeId, year])
+}
+
+model LeaveRequest {
+  id          String @id @default(cuid())
+  userId      String
+  leaveTypeId String
+  startDate   DateTime
+  endDate     DateTime
+  days        Float
+  reason      String
+  status      LeaveStatus @default(PENDING)
+
+  managerComment String?
+  actionedById   String?
+  actionedAt     DateTime?
+
+  user      User @relation(fields: [userId], references: [id])
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Appraisal {
+  id           String @id @default(cuid())
+  userId       String
+  cycleYear    Int
+  selfReview   String
+  achievements String
+  goals        String
+  selfRating   Int
+  status       AppraisalStatus @default(DRAFT)
+  submittedAt  DateTime?
+
+  user   User @relation(fields: [userId], references: [id])
+  review AppraisalReview?
+  files  AppraisalFile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, cycleYear])
+}
+
+model AppraisalReview {
+  id            String @id @default(cuid())
+  appraisalId   String @unique
+  managerId     String
+  managerRating Int
+  managerComment String
+  reviewedAt    DateTime @default(now())
+
+  appraisal Appraisal @relation(fields: [appraisalId], references: [id])
+}
+
+model AppraisalFile {
+  id          String @id @default(cuid())
+  appraisalId String
+  fileName    String
+  fileUrl     String
+  contentType String
+  uploadedAt  DateTime @default(now())
+
+  appraisal Appraisal @relation(fields: [appraisalId], references: [id])
+}
+
+model Holiday {
+  id        String @id @default(cuid())
+  name      String
+  date      DateTime @unique
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id        String @id @default(cuid())
+  title     String
+  body      String
+  pinned    Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+
+model NotificationLog {
+  id        String @id @default(cuid())
+  eventType String
+  entityId  String
+  toEmail   String
+  ccEmail   String
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+}
