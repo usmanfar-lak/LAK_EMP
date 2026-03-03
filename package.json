@@ -3,13 +3,14 @@
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "db:generate": "turbo db:generate",
-    "db:migrate": "turbo db:migrate"
+    "dev": "npx turbo dev",
+    "build": "npx turbo build",
+    "lint": "npx turbo lint",
+    "db:generate": "npx turbo db:generate",
+    "db:migrate": "npx turbo db:migrate",
+    "start": "node apps/server/index.js"
   },
-  "devDependencies": {
+  "dependencies": {
     "turbo": "^2.0.6"
   }
 }
