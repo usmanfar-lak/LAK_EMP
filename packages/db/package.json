@@ -1,13 +1,16 @@
 {
-  "name": "@lakarya/db",
+  "name": "lakarya-ess",
   "private": true,
-  "main": "index.js",
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "start": "node index.js",
-    "build": "echo No build step defined"
+    "dev": "npx turbo dev",
+    "build": "npx turbo build",
+    "lint": "npx turbo lint",
+    "db:generate": "npx turbo db:generate",
+    "db:migrate": "npx turbo db:migrate",
+    "start": "node apps/server/index.js"
   },
   "dependencies": {
-    "prisma": "^5.22.0",
-    "@prisma/client": "^5.22.0"
+    "turbo": "^2.0.6"
   }
 }
